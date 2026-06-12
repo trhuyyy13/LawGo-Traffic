@@ -1,6 +1,6 @@
-# 04_SPEC — `legal_rag_search` Tool API
+# 03_SPEC — `legal_rag_search` Tool API
 
-> Dự án: LuatGT — AI Legal Advisory Agent  
+> Dự án: LawGo Traffic — AI Legal Advisory Agent  
 > Module: GraphRAG Tool  
 > Mục tiêu: Bọc GraphRAG thành một tool riêng để Main Agent gọi khi cần căn cứ pháp lý.
 

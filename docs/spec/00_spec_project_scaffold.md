@@ -74,16 +74,20 @@ Use Python-first backend.
 ```text
 Language: Python 3.11+
 Backend API: FastAPI
-Agent orchestration: simple service layer first, LangGraph later
+UI: Streamlit
+Agent orchestration: LangGraph (ReAct loop)
 Document parser: python-docx + regex
-GraphRAG: LightRAG-based module placeholder
-Vector DB: Qdrant placeholder / local stub first
+GraphRAG: LightRAG
+Vector DB: Qdrant Cloud (stub locally first, point to Cloud in prod)
+Graph store: Neo4j AuraDB Free (semantic graph)
 Keyword Search: BM25s placeholder / local stub first
-Metadata store: JSONL first, PostgreSQL later
+Metadata / relational store: Supabase PostgreSQL
+File storage: Supabase Storage
 Cache/session: Redis placeholder, optional in scaffold
 Testing: pytest
 Code quality: ruff, mypy optional
 Env management: uv or pip + requirements.txt
+Docker: optional, docker-compose for local dev
 ```
 
 Do not set up heavy infra in the first scaffold. The first scaffold should run locally with simple commands.
@@ -175,6 +179,11 @@ lawgo-traffic/
 │       │   ├── metrics.py
 │       │   └── evaluator.py
 │       │
+│       ├── voice/
+│       │   ├── __init__.py
+│       │   ├── stt_adapter.py       # STT interface (PhoWhisper stub)
+│       │   └── tts_adapter.py       # TTS interface (Edge-TTS stub)
+│       │
 │       └── utils/
 │           ├── __init__.py
 │           ├── jsonl.py
@@ -206,7 +215,25 @@ LLM_MODEL=gpt-4o-mini
 EMBEDDING_MODEL=multilingual-e5-large
 DATA_DIR=./data
 LIGHTRAG_WORKING_DIR=./data/graph/lightrag
+
+# Qdrant Cloud
 QDRANT_URL=http://localhost:6333
+QDRANT_API_KEY=
+
+# Neo4j AuraDB Free
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=
+
+# Supabase
+SUPABASE_URL=
+SUPABASE_KEY=
+SUPABASE_BUCKET=lawgo-traffic-docs
+
+# Voice (placeholder, not required for scaffold boot)
+VOICE_ENABLED=false
+STT_MODEL=phowhisper
+TTS_VOICE=vi-VN-HoaiMyNeural
 ```
 
 For scaffold, env values can be optional with safe defaults.
@@ -479,7 +506,32 @@ Do not implement full ReAct yet.
 
 ---
 
-### 5.11 `api/main.py`
+### 5.11 `voice/stt_adapter.py` and `voice/tts_adapter.py`
+
+Purpose:
+
+- Provide stable interface so the rest of the app can accept voice input without knowing the STT/TTS implementation.
+- In scaffold, both are **stubs** — no actual model loaded, just the interface.
+
+```python
+class STTAdapter:
+    def transcribe(self, audio_bytes: bytes, language: str = "vi") -> str:
+        # stub: return empty string
+        return ""
+
+class TTSAdapter:
+    def synthesize(self, text: str, voice: str = "vi-VN-HoaiMyNeural") -> bytes:
+        # stub: return empty bytes
+        return b""
+```
+
+Voice is gated by `VOICE_ENABLED` env var. When false, the API accepts text-only input. When true, the STT adapter converts voice → text before passing to the agent, and TTS adapter converts agent response → audio.
+
+The `/chat` endpoint must accept both `message` (text) and `audio` (base64, optional) in the same request schema.
+
+---
+
+### 5.12 `api/main.py`
 
 Create FastAPI app with health endpoint.
 
@@ -496,9 +548,12 @@ POST /tools/legal-rag-search
 ```json
 {
   "message": "Xe máy vượt đèn đỏ phạt bao nhiêu?",
+  "audio": null,
   "session_id": "optional-session-id"
 }
 ```
+
+`message` and `audio` are mutually exclusive. If `audio` is provided (base64-encoded), STTAdapter transcribes it first. `VOICE_ENABLED=false` causes the endpoint to reject `audio` input with 400.
 
 `POST /tools/legal-rag-search` request:
 

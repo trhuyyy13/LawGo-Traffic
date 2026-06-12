@@ -1,0 +1,42 @@
+[
+  {
+    "id": "q001",
+    "query": "Xe máy vượt đèn đỏ phạt bao nhiêu?",
+    "intent": "fine_lookup",
+    "expected_documents": ["Nghị định 168/2024/NĐ-CP"],
+    "expected_articles": ["Điều 7"],
+    "notes": "Khoản 4, Điểm a — phạt 4-6 triệu"
+  },
+  {
+    "id": "q002",
+    "query": "Ô tô vượt đèn đỏ phạt bao nhiêu?",
+    "intent": "fine_lookup",
+    "expected_documents": ["Nghị định 168/2024/NĐ-CP"],
+    "expected_articles": ["Điều 5"],
+    "notes": ""
+  },
+  {
+    "id": "q003",
+    "query": "Không đội mũ bảo hiểm bị phạt bao nhiêu?",
+    "intent": "fine_lookup",
+    "expected_documents": ["Nghị định 168/2024/NĐ-CP"],
+    "expected_articles": ["Điều 7"],
+    "notes": ""
+  },
+  {
+    "id": "q004",
+    "query": "CSGT có quyền giữ bằng lái của tôi không?",
+    "intent": "rights_lookup",
+    "expected_documents": ["Nghị định 168/2024/NĐ-CP"],
+    "expected_articles": ["Điều 70", "Điều 72"],
+    "notes": ""
+  },
+  {
+    "id": "q005",
+    "query": "Bị tạm giữ xe thì lấy lại như thế nào?",
+    "intent": "procedure_lookup",
+    "expected_documents": ["Nghị định 168/2024/NĐ-CP"],
+    "expected_articles": [],
+    "notes": ""
+  }
+]

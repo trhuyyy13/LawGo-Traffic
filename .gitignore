@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Data (large files)
+data/extracted/
+data/parsed/
+data/chunks/
+data/graph/
+!data/extracted/.gitkeep
+!data/parsed/.gitkeep
+!data/chunks/.gitkeep
+!data/graph/.gitkeep
+!data/graph/lightrag/.gitkeep
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Temp Word lock files
+~$*.doc
+~$*.docx

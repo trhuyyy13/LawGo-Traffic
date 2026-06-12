@@ -1,6 +1,6 @@
-# 02_SPEC — Legal Parser & Parent-Child Chunking
+# 01_SPEC — Legal Parser & Parent-Child Chunking
 
-> Dự án: LuatGT — AI Legal Advisory Agent  
+> Dự án: LawGo Traffic — AI Legal Advisory Agent  
 > Module: Ingestion / Parser / Chunk Builder  
 > Mục tiêu: Biến file Word luật giao thông sạch thành dữ liệu chunk có cấu trúc để đưa vào GraphRAG.
 

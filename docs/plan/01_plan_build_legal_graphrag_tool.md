@@ -1,10 +1,10 @@
 # 01_plan_build_legal_graphrag_tool.md
 
-# Plan xây dựng Legal GraphRAG Tool cho LuatGT
+# Plan xây dựng Legal GraphRAG Tool cho LawGo Traffic
 
 ## 1. Mục tiêu
 
-Xây dựng một **GraphRAG tool** phục vụ Agent chính của LuatGT.
+Xây dựng một **GraphRAG tool** phục vụ Agent chính của LawGo Traffic.
 
 Tool này không phải chatbot độc lập. Nó là một công cụ để Agent gọi khi cần tra cứu căn cứ pháp lý, ví dụ:
 
@@ -651,16 +651,19 @@ Người dùng hỏi tự nhiên, Agent trả lời có căn cứ.
 ## 7. Stack đề xuất cho v1
 
 ```text
-Language: Python
+Language: Python 3.11+
 Doc extraction: python-docx
 Parser: regex + custom parser
 GraphRAG: LightRAG
-Vector: LightRAG built-in trước, Qdrant sau nếu cần
-Graph store: LightRAG local/NetworkX trước, Neo4j sau nếu cần
-Metadata store: JSONL trước, PostgreSQL sau
+Vector DB: Qdrant Cloud
+Graph store: Neo4j AuraDB Free (semantic graph), LightRAG local (structural)
+Metadata / relational store: Supabase PostgreSQL
+File storage: Supabase Storage (raw docx, extracted artifacts)
 API: FastAPI
-Agent orchestration: LangGraph hoặc tự viết router đơn giản
+UI: Streamlit
+Agent orchestration: LangGraph (ReAct loop)
 Eval: custom golden set + RAGAS sau
+Docker: optional (compose cho local dev)
 ```
 
 ---

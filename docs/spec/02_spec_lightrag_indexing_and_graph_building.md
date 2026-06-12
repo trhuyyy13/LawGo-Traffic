@@ -1,6 +1,6 @@
-# 03_SPEC — LightRAG Indexing & Legal Graph Building
+# 02_SPEC — LightRAG Indexing & Legal Graph Building
 
-> Dự án: LuatGT — AI Legal Advisory Agent  
+> Dự án: LawGo Traffic — AI Legal Advisory Agent  
 > Module: GraphRAG Indexing  
 > Mục tiêu: Đưa legal chunks đã chuẩn hóa vào LightRAG để tạo semantic graph và phục vụ truy xuất căn cứ pháp lý.
 
