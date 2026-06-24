@@ -241,6 +241,11 @@ def build_validation_report(
         if len(ch.get("text_raw", "")) < 10:
             warnings.append(f"W04: short text_raw in {ch['chunk_id']}")
 
+    # W08 — low-confidence OCR marker present in chunk text
+    for ch in children:
+        if "[KHÔNG RÕ:" in ch.get("text_raw", ""):
+            warnings.append(f"W08: low-confidence OCR text in {ch['chunk_id']}")
+
     report = {
         "source_file": source_file,
         "doc_id": doc_id,

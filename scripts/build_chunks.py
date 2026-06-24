@@ -66,7 +66,7 @@ def main(input_dir: str, output_dir: str) -> None:
     print(f"{'='*60}")
 
     # Surface any critical warnings
-    critical_codes = {"W01", "W02", "W05"}
+    critical_codes = {"W01", "W02", "W05", "W08"}
     for report in all_reports:
         critical = [w for w in report["warnings"] if any(w.startswith(c) for c in critical_codes)]
         if critical:
