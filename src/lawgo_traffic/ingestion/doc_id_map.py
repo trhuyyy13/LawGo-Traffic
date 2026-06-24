@@ -22,6 +22,42 @@ DOC_ID_MAP: dict[str, dict[str, str]] = {
         "doc_id": "nd336_2025",
         "document_title": "Nghị định 336/2025/NĐ-CP",
     },
+    "Luat-15-2012-QH13-XLVPHC.doc": {
+        "doc_id": "luat_xlvphc_2012",
+        "document_title": "Luật Xử lý vi phạm hành chính 15/2012/QH13",
+    },
+    "Luat-67-2020-QH14-XLVPHC-suadoi.pdf": {
+        "doc_id": "luat_xlvphc_2020",
+        "document_title": "Luật sửa đổi, bổ sung một số điều của Luật Xử lý vi phạm hành chính 67/2020/QH14",
+    },
+    "Luat-88-2025-QH15-XLVPHC-suadoi.pdf": {
+        "doc_id": "luat_xlvphc_2025",
+        "document_title": "Luật sửa đổi, bổ sung một số điều của Luật Xử lý vi phạm hành chính 88/2025/QH15",
+    },
+    "Thong-tu-35-2024-TT-BGTVT-daotao-GPLX.pdf": {
+        "doc_id": "tt35_2024_bgtvt",
+        "document_title": "Thông tư 35/2024/TT-BGTVT",
+    },
+    "Thong-tu-12-2025-TT-BCA-sathach-capGPLX.pdf": {
+        "doc_id": "tt12_2025_bca",
+        "document_title": "Thông tư 12/2025/TT-BCA",
+    },
+    "Thong-tu-47-2024-TT-BGTVT-kiemdinh-xecogioi.pdf": {
+        "doc_id": "tt47_2024_bgtvt",
+        "document_title": "Thông tư 47/2024/TT-BGTVT",
+    },
+    "Nghi-dinh-67-2023-ND-CP-baohiem-bat-buoc-xecogioi.pdf": {
+        "doc_id": "nd67_2023",
+        "document_title": "Nghị định 67/2023/NĐ-CP",
+    },
+    "Thong-tu-72-2024-TT-BCA-dieutra-tainangiaothong.pdf": {
+        "doc_id": "tt72_2024_bca",
+        "document_title": "Thông tư 72/2024/TT-BCA",
+    },
+    "Thong-tu-51-2024-TT-BGTVT-QCVN41-2024-baohieuduongbo.pdf": {
+        "doc_id": "tt51_2024_bgtvt",
+        "document_title": "Thông tư 51/2024/TT-BGTVT",
+    },
 }
 
 
