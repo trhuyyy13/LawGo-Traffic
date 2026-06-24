@@ -60,7 +60,9 @@ def _ocr_page(client: OpenAI, image_path: str) -> str:
     """Call the configured OpenAI vision model on a single page image."""
     image_bytes = Path(image_path).read_bytes()
     b64 = base64.b64encode(image_bytes).decode("ascii")
-    ext = Path(image_path).suffix.lstrip(".") or "jpeg"
+    ext = Path(image_path).suffix.lstrip(".").lower() or "jpeg"
+    if ext == "jpg":
+        ext = "jpeg"
 
     response = client.chat.completions.create(
         model=settings.ocr_model,
