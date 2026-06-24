@@ -1,4 +1,5 @@
 import base64
+import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -26,33 +27,60 @@ CHÍNH XÁC TỪNG CHỮ những gì nhìn thấy trong ảnh, theo các quy t�
 """
 
 
-def _extract_page_images(input_path: str, tmp_dir: str) -> list[str]:
-    """Extract each page's embedded original image via pdfimages.
+def _page_number_sort_key(path: Path) -> int:
+    """Extract the page number from a pdftoppm-generated filename for sorting.
 
-    Returns image paths sorted in page order (pdfimages names them
-    "<prefix>-000.<ext>", "<prefix>-001.<ext>", ... so a plain sort is
-    page-order-correct).
+    pdftoppm names output "<prefix>-<n>.png" where <n> is 1-indexed and is
+    zero-padded to the width needed for the document's total page count
+    *in some poppler versions*, but NOT in others (e.g. plain "-1", "-2", ...,
+    "-10", "-11" with no padding). A plain lexicographic string sort silently
+    misorders page 10 before page 2 whenever padding is absent, so we must
+    always sort by the parsed integer page number rather than the string.
+    """
+    match = re.search(r"-(\d+)\.[^.]+$", path.name)
+    if not match:
+        raise RuntimeError(f"could not parse page number from filename: {path.name}")
+    return int(match.group(1))
+
+
+def _extract_page_images(input_path: str, tmp_dir: str) -> list[str]:
+    """Rasterize every page to a standalone PNG via pdftoppm.
+
+    We deliberately rasterize with pdftoppm rather than extracting the
+    embedded image stream with pdfimages: some scanned documents in this
+    corpus store their pages as raw JBIG2 or CCITT-G4 fax-encoded streams,
+    which pdfimages -all extracts verbatim (".jb2e", ".ccitt"+".params") —
+    not standalone decodable image files, and OpenAI's vision API rejects
+    them with invalid_image_format. pdftoppm always rasterizes to a real
+    PNG regardless of the source encoding (JPEG, JBIG2, CCITT, anything),
+    at the cost of being slower and producing larger files.
+
+    Returns image paths sorted in page order. pdftoppm's "<prefix>-<n>.png"
+    numbering is 1-indexed and its zero-padding width is poppler-version-
+    dependent (some versions pad to the document's page count, others don't
+    pad at all), so page order is determined by parsing and sorting the
+    numeric page number rather than relying on a plain string sort.
     """
     prefix = str(Path(tmp_dir) / "page")
     try:
         result = subprocess.run(
-            ["pdfimages", "-all", input_path, prefix],
+            ["pdftoppm", "-png", "-r", "200", input_path, prefix],
             capture_output=True,
             text=True,
             check=False,
         )
     except FileNotFoundError as exc:
         raise RuntimeError(
-            "pdfimages not found — install poppler-utils (`brew install poppler` "
+            "pdftoppm not found — install poppler-utils (`brew install poppler` "
             "on macOS, `apt-get install poppler-utils` in Docker)"
         ) from exc
     if result.returncode != 0:
-        raise RuntimeError(f"pdfimages failed on {input_path}: {result.stderr.strip()}")
+        raise RuntimeError(f"pdftoppm failed on {input_path}: {result.stderr.strip()}")
 
-    images = sorted(str(p) for p in Path(tmp_dir).glob("page-*"))
+    images = sorted(Path(tmp_dir).glob("page-*.png"), key=_page_number_sort_key)
     if not images:
-        raise RuntimeError(f"pdfimages produced no images for {input_path}")
-    return images
+        raise RuntimeError(f"pdftoppm produced no images for {input_path}")
+    return [str(p) for p in images]
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10), reraise=True)
