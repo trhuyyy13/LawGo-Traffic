@@ -1,7 +1,32 @@
 import re
+import subprocess
 from collections import Counter
+from pathlib import Path
+
+from lawgo_traffic.ingestion.doc_id_map import get_doc_info
+from lawgo_traffic.utils.text_normalizer import normalize_paragraph
 
 _PAGE_NUMBER_PATTERN = re.compile(r"^\d{1,4}$")
+
+
+def run_pdftotext(input_path: str) -> str:
+    """Run poppler's pdftotext on input_path, return the full extracted text."""
+    try:
+        result = subprocess.run(
+            ["pdftotext", input_path, "-"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "pdftotext not found — install poppler-utils (`brew install poppler` "
+            "on macOS, `apt-get install poppler-utils` in Docker)"
+        ) from exc
+    if result.returncode != 0:
+        raise RuntimeError(f"pdftotext failed on {input_path}: {result.stderr.strip()}")
+    return result.stdout
 
 
 def _clean_pdf_lines(raw_text: str) -> list[str]:
@@ -34,3 +59,20 @@ def _clean_pdf_lines(raw_text: str) -> list[str]:
                 continue
             cleaned.append(line)
     return cleaned
+
+
+def extract_pdf_to_text(input_path: str) -> dict:
+    """Extract a single text-layer PDF and return the same contract as
+    docx_extractor.extract_docx_to_text().
+    """
+    info = get_doc_info(input_path)
+    raw_text = run_pdftotext(input_path)
+    lines = _clean_pdf_lines(raw_text)
+    paragraphs = [normalize_paragraph(line) for line in lines]
+    return {
+        "source_file": Path(input_path).name,
+        "doc_id": info["doc_id"],
+        "document_title": info["document_title"],
+        "paragraphs": paragraphs,
+        "extraction_method": "pdf_text",
+    }

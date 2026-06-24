@@ -26,3 +26,40 @@ def test_keeps_line_that_only_appears_once():
     lines = _clean_pdf_lines(raw)
     assert "Điều 1. Tiêu đề riêng" in lines
     assert "Điều 2. Tiêu đề khác" in lines
+
+
+from pathlib import Path
+
+import pytest
+
+from lawgo_traffic.ingestion.pdf_text_extractor import extract_pdf_to_text, run_pdftotext
+
+FIXTURE = "tests/fixtures/sample_law_text.pdf"
+
+
+def test_run_pdftotext_returns_nonempty_text():
+    text = run_pdftotext(FIXTURE)
+    assert "Điều 7" in text
+
+
+def test_run_pdftotext_missing_binary_raises(monkeypatch):
+    # Point PATH somewhere with no executables so subprocess.run can't
+    # resolve "pdftotext" and raises FileNotFoundError internally.
+    monkeypatch.setenv("PATH", "/nonexistent")
+    with pytest.raises(RuntimeError, match="pdftotext not found"):
+        run_pdftotext(FIXTURE)
+
+
+def test_extract_pdf_to_text_matches_contract(tmp_path):
+    # Copy the fixture under a filename already registered in DOC_ID_MAP
+    # (Task 2) so get_doc_info() resolves it without touching the map again.
+    fixture_copy = tmp_path / "Nghi-dinh-67-2023-ND-CP-baohiem-bat-buoc-xecogioi.pdf"
+    fixture_copy.write_bytes(Path(FIXTURE).read_bytes())
+
+    data = extract_pdf_to_text(str(fixture_copy))
+
+    assert data["doc_id"] == "nd67_2023"
+    assert data["document_title"] == "Nghị định 67/2023/NĐ-CP"
+    assert data["source_file"] == fixture_copy.name
+    assert data["extraction_method"] == "pdf_text"
+    assert any("Điều 7" in p for p in data["paragraphs"])
