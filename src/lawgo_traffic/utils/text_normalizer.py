@@ -2,6 +2,19 @@ import re
 import unicodedata
 
 
+def normalize_paragraph(text: str) -> str:
+    """Normalize a single paragraph from a Vietnamese legal .docx file.
+
+    Applied BEFORE the state machine parser sees any text.
+    """
+    text = text.replace("\xa0", " ")       # non-breaking space — found in Luật 36
+    text = text.replace("​", "")      # zero-width space
+    text = text.replace("’", "'")     # curly right apostrophe
+    text = text.replace("‘", "'")     # curly left apostrophe
+    text = re.sub(r"[ \t]+", " ", text)   # collapse spaces/tabs (not newlines)
+    return text.strip()
+
+
 def normalize_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 

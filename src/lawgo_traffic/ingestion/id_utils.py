@@ -8,6 +8,15 @@ def slugify(text: str) -> str:
     return re.sub(r"\s+", "_", text.strip())
 
 
+def encode_point_letter(letter: str) -> str:
+    """Encode a Vietnamese point letter for use in chunk IDs.
+
+    'đ' → 'dd' to avoid non-ASCII characters in IDs.
+    All other letters are returned as-is.
+    """
+    return "dd" if letter == "đ" else letter
+
+
 def make_article_id(doc_id: str, article_number: str) -> str:
     return f"{doc_id}_dieu_{article_number}"
 
@@ -17,4 +26,5 @@ def make_clause_id(doc_id: str, article_number: str, clause_number: str) -> str:
 
 
 def make_point_id(doc_id: str, article_number: str, clause_number: str, point_letter: str) -> str:
-    return f"{doc_id}_dieu_{article_number}_khoan_{clause_number}_diem_{point_letter}"
+    encoded = encode_point_letter(point_letter)
+    return f"{doc_id}_dieu_{article_number}_khoan_{clause_number}_diem_{encoded}"

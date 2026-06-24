@@ -40,5 +40,9 @@ class Settings(BaseSettings):
     stt_model: str = "phowhisper"
     tts_voice: str = "vi-VN-HoaiMyNeural"
 
+    # OCR (set OCR_ENABLED=true to activate; reuses LLM_API_KEY above)
+    ocr_enabled: bool = False
+    ocr_model: str = "gpt-5.4-mini"
+
 
 settings = Settings()
