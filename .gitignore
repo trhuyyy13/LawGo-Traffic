@@ -50,3 +50,6 @@ htmlcov/
 # Temp Word lock files
 ~$*.doc
 ~$*.docx
+
+# Subagent-driven-development scratch state
+.superpowers/
