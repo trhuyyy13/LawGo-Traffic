@@ -37,3 +37,31 @@ def detect_format(filepath: str) -> str:
         avg_chars = len(raw_text.strip()) / pages if pages else 0
         return "pdf_ocr" if avg_chars < PDF_OCR_AVG_CHARS_PER_PAGE_THRESHOLD else "pdf_text"
     raise ValueError(f"Unsupported file extension '{suffix}' for {filepath}")
+
+
+def convert_doc_to_docx(input_path: str, output_dir: str) -> str:
+    """Convert a legacy .doc file to .docx via headless LibreOffice.
+
+    Returns the path to the converted .docx file.
+    """
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    try:
+        result = subprocess.run(
+            ["soffice", "--headless", "--convert-to", "docx", "--outdir", output_dir, input_path],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "soffice not found — install LibreOffice "
+            "(`brew install --cask libreoffice` on macOS, "
+            "`apt-get install libreoffice-writer` in Docker)"
+        ) from exc
+    if result.returncode != 0:
+        raise RuntimeError(f"soffice conversion failed on {input_path}: {result.stderr.strip()}")
+
+    converted = Path(output_dir) / (Path(input_path).stem + ".docx")
+    if not converted.exists():
+        raise RuntimeError(f"soffice did not produce expected output: {converted}")
+    return str(converted)
